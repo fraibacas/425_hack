@@ -1,0 +1,102 @@
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<p class="form-help">
+  The <em>Memcached Manager</em> allows you to cache the result of
+  calling expensive objects, such as Python Scripts and External
+  Methods, in memory. Because it does <em>not</em> cache HTTP headers,
+  caching full web pages is generally not advised.
+</p>
+
+<form action="manage_editProps" method="POST">
+<dtml-with getSettings mapping>
+<table cellspacing="0" cellpadding="2" border="0">
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-optional">
+      Title
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="title" size="40"
+     value="&dtml-title;" />
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    REQUEST variables
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <textarea name="request_vars:lines" rows="5" cols="30"><dtml-in
+     request_vars>&dtml-sequence-item;
+</dtml-in></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Servers
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <textarea name="servers:lines" rows="5" cols="30"><dtml-in
+     servers>&dtml-sequence-item;
+</dtml-in></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Mirrors that need to be invalidated
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <textarea name="mirrors:lines" rows="5" cols="30"><dtml-try><dtml-in
+     mirrors>&dtml-sequence-item;
+</dtml-in><dtml-except></dtml-try></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Maximum age of a cache entry (seconds).
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="max_age" size="40"
+     value="&dtml-max_age;" />
+    <br />
+    This is the maximum allowed age of a cache entry. After this period of time it
+    will be gone completely from the cache. A max age of 0 means the data is left in cache indefinitely.
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Debug?
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="checkbox" name="debug"
+           value="1"<dtml-if
+     debug> checked="checked"</dtml-if> />
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    </td>
+    <td align="left" valign="top">
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit"
+     value="Save Changes" />
+    </div>
+    </td>
+  </tr>
+</table>
+</dtml-with>
+</form>
+
+<dtml-var manage_page_footer>
+

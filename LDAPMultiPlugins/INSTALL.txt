@@ -1,0 +1,10 @@
+Installation
+============
+Products.LDAPMultiPlugins is installed as an egg using 
+setuptools[1], or by including it as a dependency in 
+zc.buildout[2] buildout configurations.
+
+After installation you need to restart Zope to load the package.
+
+[1] http://peak.telecommunity.com/DevCenter/setuptools
+[2] http://www.buildout.org/

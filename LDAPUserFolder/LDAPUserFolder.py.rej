@@ -1,0 +1,18 @@
+***************
+*** 1428,1436 ****
+          mappings = getattr(self, '_groups_mappings', {})
+          roles = []
+  
+-         if getattr(self, '_implicit_mapping', None):
+-             roles = groups
+- 
+          for group in groups:
+              mapped_role = mappings.get(group, None)
+              if mapped_role is not None and mapped_role not in roles:
+--- 1428,1433 ----
+          mappings = getattr(self, '_groups_mappings', {})
+          roles = []
+  
+          for group in groups:
+              mapped_role = mappings.get(group, None)
+              if mapped_role is not None and mapped_role not in roles:

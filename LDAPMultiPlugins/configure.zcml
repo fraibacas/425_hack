@@ -1,0 +1,28 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="ldapmultiplugins"
+    >
+
+  <!-- Only install GenericSetup handlers if GenericSetup is installed -->
+  <configure
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    zcml:condition="installed Products.GenericSetup">
+
+    <adapter factory=".exportimport.LDAPMultiPluginXMLAdapter"/>
+
+    <genericsetup:importStep
+        name="ldapmultiplugins"
+        title="LDAPMultiPlugins"
+        description="Import LDAPMultiPlugins settings"
+        handler="Products.LDAPMultiPlugins.exportimport.importLDAPMultiPlugins"/>
+
+    <genericsetup:exportStep
+        name="ldapmultiplugins"
+        title="LDAPMultiPlugins"
+        description="Export LDAPMultiPlugins settings"
+        handler="Products.LDAPMultiPlugins.exportimport.exportLDAPMultiPlugins"/>
+
+  </configure>
+
+</configure>

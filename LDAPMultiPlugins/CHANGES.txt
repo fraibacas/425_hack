@@ -1,0 +1,47 @@
+Changelog for Products.LDAPMultiplugins
+=======================================
+
+To see earlier changes please see HISTORY.txt.
+
+1.14 (2011-04-06)
+-----------------
+- Bug: When a user could not be authenticated, the plugins 
+  would incorrectly return a tuple (None, None) instead
+  of just None as specified in the PAS IAuthenticationPlugin 
+  interface.
+  (https://bugs.launchpad.net/bugs/751247)
+
+
+1.13 (2010-11-18)
+-----------------
+- Bug: When searching for roles, make sure to consider all 
+  search terms.
+  (https://bugs.launchpad.net/bugs/656011)
+
+
+1.12 (2010-07-29)
+-----------------
+- Bug: Demangling user prefix could not deal with non-string user
+  ids, which may appear in certain cases.
+  (https://bugs.launchpad.net/bugs/586931)
+
+- Feature: Added some Sphinx documentation (backport from trunk)
+
+- Reorganisation: Move documentation text files around to conform
+  to the zope.org repository policy on package layout.
+
+
+1.11 (2010-05-28)
+-----------------
+- Bug: Added GenericSetup magic to fully provide the INode interface
+  for the exporter and importer classes, making it easier to nest 
+  within other importers.
+  (https://bugs.launchpad.net/bugs/586500)
+
+
+1.10 (2010-05-27)
+-----------------
+- Bug: enumerateUsers returned undesired results if an exact match
+  was required since LDAP searches are not case sensitive.
+  (https://bugs.launchpad.net/bugs/585901)
+

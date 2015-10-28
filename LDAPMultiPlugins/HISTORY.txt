@@ -1,0 +1,232 @@
+==================
+HISTORICAL CHANGES
+==================
+
+1.9 (2010-01-27)
+----------------
+
+- Feature: The enumerateUsers method has a parameter "exact_match" that 
+  was only applied if the search was by logn or user id, since that is
+  the way it is used in the standard PluggableAuthService plugins. 
+  However, the user folder searchUsers method can accept this parameter
+  as well and thus limit searches by other criteria to exact matches.
+  This is useful enough to implement, even though it breaks the standard.
+  (http://www.dataflake.org/tracker/issue_00656)
+
+
+1.8 (2009-02-17)
+----------------
+
+- Bug: Move plugin registration from initialize method to module level to
+  avoid multiple registrations.
+  (http://www.dataflake.org/tracker/issue_00631 by Ramon Navarro Bosch)
+
+- Feature: Implemented GenericSetup import/export handlers and registered
+  import/export steps.
+
+- Bug: Fixed the Zope dependency, which was listed as 2.8+. It's 2.9+.
+
+
+1.7 (2008-07-19)
+----------------
+
+- Bug: LDAPMultiPlugin.enumerateUsers: The variable used as key for the
+  caching mechanism was mutated after being computed, leading to cache
+  keys that can never be found again. Found by Wichert Akkerman.
+  (http://www.dataflake.org/tracker/issue_00613)
+
+
+1.6 (2008-06-05)
+----------------
+
+- Bug: ActiveDirectoryMultiPlugin.enumerateGroups: In order to support
+  group searches on the binary objectGUID attribute, utilize a new
+  flag exposed by the LDAPUserFolder LDAPDelegate search method
+  that prevents the customary UTF8-encoding of the search filter
+  expression. **NOTE**: With this change the LDAPUserFolder version
+  dependency changes to version 2.9 or higher!
+  (http://www.dataflake.org/tracker/issue_00576 by Wichert Akkerman)
+
+- Bug: ActiveDirectoryMultiPlugin.enumerateGroups: If the requested group
+  id is a binary string, like a objectGUID attribute, it was mangled
+  by a lowercasing operation. Removed the lowercasing.
+  (http://www.dataflake.org/tracker/issue_00575 by Wichert Akkerman)
+
+- Feature: Added caching to the getGroupsForPrincipal method. Thanks to 
+  Wichert Akkerman for the patch.
+  (http://www.dataflake.org/tracker/issue_00571)
+
+
+1.5 (2007-06-13)
+----------------
+
+- Bug: The product will no longer silently fail to install if the 
+  LDAPUserFolder package is not installed. Silent failure does
+  not look like a good strategy here.
+
+- Bug: fixes and import cleanups after running Pyflakes
+  (http://divmod.org:81/svn/Divmod/trunk/Pyflakes/)
+
+- Documentation: added some additional configuration hints to the README, 
+  thanks go to Brett Lentz (http://www.dataflake.org/tracker/issue_00559)
+
+
+1.5-beta (2007-03-03)
+---------------------
+
+- LDAPMultiPlugin.enumerateUsers: If no useful search criteria are
+  given (meaning no user ID or login is specified), fabricate a
+  criteria set that will return all users, this is the expected
+  behavior when calling enumerateUsers.
+
+- LDAPMultiPlugin.enumerateUsers: When iterating over search results
+  from the user folder we now look for the special "fake result"
+  emitted by the user folder if there is an error. Not elegant, but
+  needed until error handling is changed in the LDAPUserFolder.
+
+- Instead of throwing exceptions, the ActiveDirectoryMultiPlugin
+  will now log error conditions and continue, with a patch from
+  Mark Hammond.
+  (http://www.dataflake.org/tracker/issue_00554)
+
+- Adjusted an import that has been removed from the
+  PluggableAuthService utils module.
+  (http://www.dataflake.org/tracker/issue_00542)
+
+- Remove the ICredentialsUpdatePlugin implementation - it was
+  implemented wrongly and should not have been part of the contract
+  at all due to an interface misunderstanding.
+  (http://www.dataflake.org/tracker/issue_00539)
+
+- Moved the PluggableAuthService dependency up to version 1.4
+
+
+1.4 (2006-10-16)
+----------------
+
+- The ActiveDirectoryMultiPlugin did not ensure to correctly
+  escape search filters it constructed internally.
+  (http://www.dataflake.org/tracker/issue_00507)
+
+- The add form selection whether or not to use SSL for the LDAP
+  server connection was not handed through correctly, identified
+  by Olivier Nicole (http://www.dataflake.org/tracker/issue_00526)
+
+- Revamped the way recursive group memberships are found and applied,
+  not sure if the previous implementation was a bug or not. Many thanks
+  to John Hannon for a patch. This change includes the ability to 
+  specify a nesting depth to which the recursive search will go.
+  (http://www.dataflake.org/tracker/issue_00513)
+
+- Added some notes on how to enable caching using the ZCacheable
+  mechanism
+
+
+1.3 (2006-07-29)
+----------------
+
+- Update the enumerateGroups method to use the new LDAPUserFolder
+  method "searchGroups". This changes the LDAPUserFolder dependency
+  to version 2.7. Patch provided by Leonardo Rochael Almeida.
+
+- The ActiveDirectoryMultiPlugin enumerateUsers method would only
+  search correctly if login or id were explicitly specified 
+  (thanks to Sidnei da Silva for the patch).
+
+- Make sure to apply the same checks for user existence in
+  getRolesForPrincipal that are used by getPropertiesForUser
+  (http://www.dataflake.org/tracker/issue_00503 by Riccardo Lemmi)
+
+- Fixed the enumerateUsers implementation to be more efficient and
+  use the new searchUsers method on the LDAPUserFolder (thanks to
+  Wichert Akkerman for the problem description and solution)
+
+- Added simple caching of groups information, provided by 
+  Leonardo Rochael Almeida.
+
+- Software dependencies are now documented in a separate 
+  DEPENDENCIES.txt file. Please note that the packages mentioned
+  in DEPENDENCIES.txt may have their own dependencies that must be
+  satisfied as well.
+
+- Replaced all zLOG usage with equivalent calls into the Python
+  logging module, and reducing the chattiness coded into the
+  ActiveDirectoryMultiPlugin (INFO -> DEBUG)
+
+- Started on a test suite
+
+
+1.2 (2006-03-02)
+----------------
+
+- In order to avoid duplicate search results, the enumerateUsers
+  method used a simple dictionary to store DNs for records that
+  were already processed. However, the keys put into this dictionary
+  were munged and really could not be compared to raw search
+  result DNs anymore. Thanks go to Wichert Akkerman for spotting this
+  obvious error (http://www.dataflake.org/tracker/issue_00485).
+
+- Speed up enumerateGroups by letting the LDAP server do more of
+  the filtering (thanks to Wichert Akkerman,
+  http://www.dataflake.org/tracker/issue_00483)
+
+- Applied a performance fix to the ActiveDirectoryPlugin's
+  _recurseGroups method (thanks got to Mark Hammond for the patch,
+  http://www.dataflake.org/tracker/issue_00476)
+
+
+1.1 (2005-10-29)
+----------------
+
+- The LDAPMultiPlugins ignored default roles configured on the
+  LDAPUserFolder and would not add it to the set of roles
+  computed (seen by Sidnei da Silva).
+
+- enumerateUsers now allows you to do exact-match searches on 
+  attributes other than just the user ID and login (patch
+  by Sidnei da Silva). **Note**: This code now requires
+  LDAPUserFolder versions 2.6 or higher, which support exact 
+  match searches using LDAPUserFolder.findUsers.
+
+
+1.0 (2005-08-18)
+----------------
+
+- The interface machinery expected by the PluggableAuthService has
+  been changed to use Zope 3-style interfaces. Thanks go to Leonardo 
+  Rochael Almeida who provided a patch to fix the resulting breakage.
+
+- Changed the initialization code for the plugins to conform to the
+  changed initialization code in the LDAPUserFolder product versions
+  2.6beta3 and up.
+
+
+1.0beta3
+--------
+
+- Changes to the way the user IDs are mangled/unmangled to be in line
+  with the changes in the latest PluggableAuthService code
+  (Patch provided by Mark Hammond)
+
+
+1.0beta2
+--------
+
+- When retrieving properties for a user, None values have to be
+  converted to an empty string to prevent the user propertysheet
+  machinery from blowing up trying to guess what kind of 
+  property a None value could represent.
+
+
+1.0beta1
+--------
+
+- Role retrieval was broken, small fix involves changing a call to the
+  LDAPUserFolder
+
+
+LDAPMultiPlugins 0.9
+--------------------
+
+- First public release
+
