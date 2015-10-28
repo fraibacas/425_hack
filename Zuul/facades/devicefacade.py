@@ -43,6 +43,8 @@ from Products.ZenEvents.Event import Event
 from Products.ZenUtils.guid.interfaces import IGlobalIdentifier
 from Products.ZenUtils.jsonutils import unjson
 
+from Products.Zuul.catalog.interfaces import IModelCatalogTool
+
 log = logging.getLogger('zen.DeviceFacade')
 
 
@@ -158,6 +160,7 @@ class DeviceFacade(TreeFacade):
             types = (types,)
         if isinstance(meta_type, basestring):
             meta_type = (meta_type,)
+        """
         querySet = []
         if meta_type:
             querySet.append(Or(*(Eq('meta_type', t) for t in meta_type)))
@@ -171,12 +174,24 @@ class DeviceFacade(TreeFacade):
         if 'getAllPaths' not in cat.indexes():
             obj.device()._createComponentSearchPathIndex()
         brains = cat.evalAdvancedQuery(query)
+        """
+
+        #-----------------------------------
+        # Lets use model catalog instead
+        model_catalog = IModelCatalogTool(self.context.dmd)
+        querySet = []
+        if meta_type:
+            querySet.append(Or(*(Eq('meta_type', t) for t in meta_type)))
+        querySet.append(Generic('path', uid))
+        model_query = And(*querySet)
+        model_query_results = model_catalog.search(query=model_query)
+        brains = [ brain for brain in model_query_results.results ]
+        #-----------------------------------
 
         # unbrain the results
         comps=map(IInfo, map(unbrain, brains))
         total = len(comps)
         hash_ = str(total)
-
 
         # filter the components
         if name is not None:
@@ -206,11 +221,27 @@ class DeviceFacade(TreeFacade):
         componentTypes = {}
         uuidMap = {}
 
+        """
         dev = self._getObject(uid)
+        
         for brain in dev.componentSearch():
             uuidMap[brain.getUUID] = brain.meta_type
             compType = componentTypes.setdefault(brain.meta_type, { 'count' : 0, 'severity' : 0 })
             compType['count'] += 1
+        """
+        # Let's use model catalog instead
+
+        model_catalog = IModelCatalogTool(self.context.dmd)
+        model_query = Eq('objectImplements', "Products.ZenModel.DeviceComponent.DeviceComponent")
+        model_query = And(model_query, Eq("deviceId", uid))
+        model_query_results = model_catalog.search(query=model_query)
+
+        for brain in model_query_results.results:
+            uuidMap[brain.uuid] = brain.meta_type
+            compType = componentTypes.setdefault(brain.meta_type, { 'count' : 0, 'severity' : 0 })
+            compType['count'] += 1
+
+        #-------------------------------------------
 
         # Do one big lookup of component events and merge back in to type later
         if not uuidMap:
