@@ -34,7 +34,7 @@ def relPath(obj, relname):
 
 def devicePathsFromComponent(comp):
     c_paths = IPathReporter(comp).getPaths()
-    return [path + ('device',) for path in c_paths[1:]]
+    return [path + ('device',) for path in c_paths]
 
 
 class DefaultPathReporter(object):
@@ -73,6 +73,11 @@ class InterfacePathReporter(DefaultPathReporter):
         for ip in self.context.ipaddresses.objectValuesGen():
             paths.extend(relPath(ip, 'network'))
         return paths
+
+
+class IpAddressPathReporter(DefaultPathReporter):
+    def getPaths(self):
+        return [ self.context.getPrimaryPath() ]
 
 
 class ProcessPathReporter(DefaultPathReporter):

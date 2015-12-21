@@ -179,6 +179,15 @@ class IpInterface(OSComponent, Layer2Linkable, IpInterfaceIndexable):
             if id == 'macaddress':
                 self.index_object()
 
+    #------------------------------------------
+    #--    ITreeSpanningComponent methods   --
+
+    def get_indexable_peers(self):
+        """  """
+        return self.ipaddresses()
+
+    #------------------------------------------
+
     def index_object(self, idxs=None):
         """
         Override the default so that links are indexed.
@@ -222,10 +231,13 @@ class IpInterface(OSComponent, Layer2Linkable, IpInterfaceIndexable):
         Reindexes all the ip addresses on this interface
         after it has been deleted
         """
+        device = self.device()
         ips = self.ipaddresses()
         super(IpInterface, self).manage_deleteComponent(REQUEST)
         for ip in ips:
             ip.primaryAq().index_object()
+        if device:
+            notify(IndexingEvent(device, idxs=["path"])) # We need to delete the iface path from the device
 
     def manage_editProperties(self, REQUEST):
         """
