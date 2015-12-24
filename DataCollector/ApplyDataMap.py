@@ -225,10 +225,15 @@ class ApplyDataMap(object):
             transaction.abort()
         else:
             device.setLastChange()
+            # This is for IpInterfaces so the device get its paths updated.
+            # Should we think of doing this differently?
+            notify(IndexingEvent(device))
             trans = transaction.get()
             trans.setUser("datacoll")
             trans.note("data applied from automated collection")
+
         log.debug("_applyDataMap for Device %s will modify %d objects for %s", device.getId(), self.num_obj_changed,logname)
+
         return changed
 
 
@@ -421,7 +426,7 @@ class ApplyDataMap(object):
         if changed:
             if getattr(aq_base(obj), "index_object", False):
                 log.debug("indexing object %s", obj.id)
-                obj.index_object()
+                obj.index_object()     # @TODO REMOVE THIS ONCE ALL CATALOGS ARE MIGRATED TO SOLR
             notify(IndexingEvent(obj))
         else:
             obj._p_deactivate()
